@@ -1,0 +1,21 @@
+[
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "hashValue",
+        "type": "string"
+      }
+    ],
+    "name": "storeHash",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

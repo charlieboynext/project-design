@@ -1,0 +1,176 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "http://maven.aliyun.com/nexus/content/groups/public/"}
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+        mavenLocal()
+
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.1.1.RELEASE")
+    }
+}
+plugins {
+    id 'org.springframework.boot' version '2.1.1.RELEASE'
+}
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'maven'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+group = 'org.example'
+version = '1.0.0-SNAPSHOT'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url "http://maven.aliyun.com/nexus/content/groups/public/"}
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+    maven { url "https://dl.bintray.com/ethereum/maven/" }
+    maven { url "https://oss.sonatype.org/service/local/staging/deploy/maven2"}
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    all {
+    }
+}
+
+dependencies {
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.hibernate.common:hibernate-commons-annotations:5.1.0.Final'
+    implementation 'org.slf4j:slf4j-api:1.7.5'
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    runtimeOnly 'mysql:mysql-connector-java'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    compile ('org.fisco-bcos.java-sdk:fisco-bcos-java-sdk:2.7.2') {
+        exclude group: 'org.slf4j'
+    }
+}
+
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+        resources  {
+            srcDir 'src/main/resources'
+        }
+    }
+}
+test {
+    useJUnitPlatform()
+}
+bootJar {
+    destinationDir file('dist')
+    archiveName project.name + '-exec.jar'
+    doLast {
+        copy {
+            from file('src/main/resources')
+            into 'dist'
+        }
+    }
+}
+
+clean {
+    println "delete ${projectDir}/dist"
+    delete "${projectDir}/dist"
+}
+
+// ========== 前端任务配置 ==========
+def frontendDir = "${projectDir}/frontend"
+def nodeModulesDir = "${frontendDir}/node_modules"
+
+// 检测 Node.js 和 npm 是否可用
+def isWindows = System.getProperty('os.name').toLowerCase().contains('windows')
+def npmCmd = isWindows ? 'npm.cmd' : 'npm'
+def nodeCmd = isWindows ? 'node.exe' : 'node'
+
+task checkNode {
+    description = '检查 Node.js 和 npm 是否已安装'
+    doLast {
+        try {
+            exec {
+                commandLine nodeCmd, '--version'
+            }
+            exec {
+                commandLine npmCmd, '--version'
+            }
+            println "✓ Node.js 和 npm 已安装"
+        } catch (Exception e) {
+            throw new GradleException("未找到 Node.js 或 npm，请先安装 Node.js: https://nodejs.org/")
+        }
+    }
+}
+
+task npmInstall(type: Exec) {
+    description = '安装前端依赖'
+    group = 'frontend'
+    dependsOn checkNode
+    workingDir = frontendDir
+    commandLine = [npmCmd, 'install']
+    onlyIf {
+        !file(nodeModulesDir).exists() || file("${frontendDir}/package-lock.json").lastModified() > file(nodeModulesDir).lastModified()
+    }
+}
+
+task npmBuild(type: Exec) {
+    description = '构建前端生产版本'
+    group = 'frontend'
+    dependsOn npmInstall
+    workingDir = frontendDir
+    commandLine = [npmCmd, 'run', 'build']
+}
+
+task npmDev(type: Exec) {
+    description = '启动前端开发服务器 (在 http://localhost:5173)'
+    group = 'frontend'
+    dependsOn npmInstall
+    workingDir = frontendDir
+    commandLine = [npmCmd, 'run', 'dev']
+    // 设置为后台运行
+    doLast {
+        println "前端开发服务器已启动在 http://localhost:5173"
+        println "按 Ctrl+C 停止服务器"
+    }
+}
+
+// 可选：同时运行前后端的任务（需要两个终端）
+task dev {
+    description = '开发模式：提示如何同时运行前后端'
+    group = 'application'
+    doLast {
+        println "=========================================="
+        println "开发模式启动指南："
+        println "=========================================="
+        println ""
+        println "方式1: 使用 Gradle 任务"
+        println "  终端1: gradlew bootRun          (启动后端)"
+        println "  终端2: gradlew npmDev           (启动前端)"
+        println ""
+        println "方式2: 手动启动"
+        println "  终端1: gradlew bootRun          (启动后端)"
+        println "  终端2: cd frontend && npm run dev  (启动前端)"
+        println ""
+        println "后端地址: http://localhost:8080"
+        println "前端地址: http://localhost:5173"
+        println "=========================================="
+    }
+}

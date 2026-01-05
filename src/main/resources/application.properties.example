@@ -1,0 +1,33 @@
+### BCOS connection (optional; set system.bcos-enabled=true when the node is reachable)
+system.peers=${BCOS_PEERS:127.0.0.1:20200}
+system.groupId=${BCOS_GROUP_ID:1}
+system.certPath=${BCOS_CERT_PATH:conf}
+system.hexPrivateKey=${BCOS_HEX_PRIVATE_KEY:}
+system.bcos-enabled=${BCOS_ENABLED:false}
+system.contract.assetAddress=${BCOS_ASSET_ADDRESS:}
+system.contract.hashRecorderAddress=${BCOS_HASHRECORDER_ADDRESS:}
+system.contract.traceabilityAddress=${BCOS_TRACEABILITY_ADDRESS:}
+
+### Spring Boot
+server.port=${SERVER_PORT:8080}
+server.session.timeout=60
+banner.charset=UTF-8
+spring.jackson.date-format=yyyy-MM-dd HH:mm:ss
+spring.jackson.time-zone=GMT+8
+
+### Datasource (MySQL; override via env vars)
+spring.datasource.url=${DB_URL:jdbc:mysql://localhost:3306/traceability?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true}
+spring.datasource.driver-class-name=${DB_DRIVER:com.mysql.cj.jdbc.Driver}
+spring.datasource.username=${DB_USER:root}
+spring.datasource.password=${DB_PASSWORD:}
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=${DB_DIALECT:org.hibernate.dialect.MySQL8Dialect}
+
+### JWT (HS512 requires >= 64 bytes secret)
+security.jwt.secret=${JWT_SECRET:please-change-this-to-a-long-secret-at-least-64-bytes-please-change-this-to-a-long-secret}
+security.jwt.expiration=${JWT_EXPIRATION:3600000}
+
+### Security
+app.security.open=${APP_SECURITY_OPEN:false}
+

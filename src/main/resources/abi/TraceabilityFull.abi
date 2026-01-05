@@ -1,0 +1,193 @@
+[
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{"name": "", "type": "address"}],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {"name": "_traceCode", "type": "string"},
+      {"name": "_name", "type": "string"},
+      {"name": "_origin", "type": "string"},
+      {"name": "_manufacturer", "type": "string"}
+    ],
+    "name": "addProduct",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {"name": "_traceCode", "type": "string"},
+      {"name": "_name", "type": "string"},
+      {"name": "_origin", "type": "string"},
+      {"name": "_manufacturer", "type": "string"}
+    ],
+    "name": "updateProduct",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [{"name": "_traceCode", "type": "string"}],
+    "name": "getProduct",
+    "outputs": [
+      {
+        "components": [
+          {"name": "traceCode", "type": "string"},
+          {"name": "name", "type": "string"},
+          {"name": "origin", "type": "string"},
+          {"name": "manufacturer", "type": "string"},
+          {"name": "exists", "type": "bool"}
+        ],
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "getAllProducts",
+    "outputs": [
+      {
+        "components": [
+          {"name": "traceCode", "type": "string"},
+          {"name": "name", "type": "string"},
+          {"name": "origin", "type": "string"},
+          {"name": "manufacturer", "type": "string"},
+          {"name": "exists", "type": "bool"}
+        ],
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {"name": "_traceCode", "type": "string"},
+      {"name": "_shipQuantity", "type": "uint256"},
+      {"name": "_shipDate", "type": "string"},
+      {"name": "_origin", "type": "string"},
+      {"name": "_productName", "type": "string"},
+      {"name": "_receiverAddress", "type": "string"}
+    ],
+    "name": "addInventory",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [{"name": "_traceCode", "type": "string"}],
+    "name": "getInventory",
+    "outputs": [
+      {
+        "components": [
+          {"name": "traceCode", "type": "string"},
+          {"name": "shipQuantity", "type": "uint256"},
+          {"name": "shipDate", "type": "string"},
+          {"name": "origin", "type": "string"},
+          {"name": "productName", "type": "string"},
+          {"name": "receiverAddress", "type": "string"},
+          {"name": "exists", "type": "bool"}
+        ],
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {"name": "_traceCode", "type": "string"},
+      {"name": "_productName", "type": "string"},
+      {"name": "_origin", "type": "string"},
+      {"name": "_quantity", "type": "uint256"},
+      {"name": "_price", "type": "uint256"},
+      {"name": "_listDate", "type": "string"},
+      {"name": "_shipDate", "type": "string"},
+      {"name": "_receiveDate", "type": "string"}
+    ],
+    "name": "addGoods",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [{"name": "_traceCode", "type": "string"}],
+    "name": "getGoods",
+    "outputs": [
+      {
+        "components": [
+          {"name": "traceCode", "type": "string"},
+          {"name": "productName", "type": "string"},
+          {"name": "origin", "type": "string"},
+          {"name": "quantity", "type": "uint256"},
+          {"name": "price", "type": "uint256"},
+          {"name": "listDate", "type": "string"},
+          {"name": "shipDate", "type": "string"},
+          {"name": "receiveDate", "type": "string"},
+          {"name": "exists", "type": "bool"}
+        ],
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": false, "name": "traceCode", "type": "string"},
+      {"indexed": false, "name": "name", "type": "string"}
+    ],
+    "name": "ProductAdded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": false, "name": "traceCode", "type": "string"},
+      {"indexed": false, "name": "shipQuantity", "type": "uint256"},
+      {"indexed": false, "name": "shipDate", "type": "string"}
+    ],
+    "name": "InventorySaved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": false, "name": "traceCode", "type": "string"},
+      {"indexed": false, "name": "quantity", "type": "uint256"},
+      {"indexed": false, "name": "price", "type": "uint256"}
+    ],
+    "name": "GoodsSaved",
+    "type": "event"
+  }
+]
+

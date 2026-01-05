@@ -1,0 +1,34 @@
+# ===== OS / Editor =====
+.DS_Store
+Thumbs.db
+
+.idea/
+.vscode/
+*.iml
+
+# ===== Java / Gradle =====
+.gradle/
+build/
+dist/
+out/
+bin/
+*.log
+
+# ===== Frontend (Vite) =====
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.cache/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# ===== Local config / secrets =====
+src/main/resources/application.properties
+src/main/resources/conf/*.key
+src/main/resources/conf/*.pem
+src/main/resources/conf/*.p12
+src/main/resources/conf/*.jks
+src/main/resources/config/
+
