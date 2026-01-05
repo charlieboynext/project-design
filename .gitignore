@@ -26,9 +26,6 @@ frontend/pnpm-debug.log*
 
 # ===== Local config / secrets =====
 src/main/resources/application.properties
-src/main/resources/conf/*.key
-src/main/resources/conf/*.pem
-src/main/resources/conf/*.p12
-src/main/resources/conf/*.jks
+src/main/resources/conf/*
+!src/main/resources/conf/README.md
 src/main/resources/config/
-
