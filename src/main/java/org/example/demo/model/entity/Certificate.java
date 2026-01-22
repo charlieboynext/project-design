@@ -20,6 +20,12 @@ public class Certificate extends BaseEntity {
   @Column(length = 160)
   private String hash;
 
+  @Column(length = 32)
+  private String anchorStatus = "offchain"; // offchain, pending, onchain, failed
+
+  @Column(length = 128)
+  private String anchorTxHash;
+
   private LocalDate expireDate;
 
   @Enumerated(EnumType.STRING)
@@ -47,6 +53,22 @@ public class Certificate extends BaseEntity {
 
   public void setHash(String hash) {
     this.hash = hash;
+  }
+
+  public String getAnchorStatus() {
+    return anchorStatus;
+  }
+
+  public void setAnchorStatus(String anchorStatus) {
+    this.anchorStatus = anchorStatus;
+  }
+
+  public String getAnchorTxHash() {
+    return anchorTxHash;
+  }
+
+  public void setAnchorTxHash(String anchorTxHash) {
+    this.anchorTxHash = anchorTxHash;
   }
 
   public LocalDate getExpireDate() {
