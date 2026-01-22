@@ -34,10 +34,10 @@ public class TxController {
           r.setTxHash(h.getTxHash());
           r.setTimestamp(h.getCreatedAt() != null ? h.getCreatedAt().toString() : null);
           r.setDataHash(h.getDataHash());
-          r.setBlockNumber(null);
-          r.setType("hash_record");
-          r.setProductId(null);
-          r.setBatchNo(null);
+          r.setBlockNumber(h.getBlockNumber());
+          r.setType(h.getType() != null ? h.getType() : "hash_record");
+          r.setProductId(h.getProductId() != null ? String.valueOf(h.getProductId()) : null);
+          r.setBatchNo(h.getBatchNo());
           return r;
         }).collect(Collectors.toList());
     return CommonResponse.ok(new org.example.demo.model.dto.PageResponse<>(items, paged.getTotalElements()));

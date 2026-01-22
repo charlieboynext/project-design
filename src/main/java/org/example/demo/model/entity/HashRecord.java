@@ -18,6 +18,18 @@ public class HashRecord extends BaseEntity {
   @Column(length = 128)
   private String txHash;
 
+  @Column
+  private Long blockNumber;
+
+  @Column(length = 64)
+  private String type;
+
+  @Column
+  private Long productId;
+
+  @Column(length = 120)
+  private String batchNo;
+
   public String getDataHash() {
     return dataHash;
   }
@@ -40,5 +52,37 @@ public class HashRecord extends BaseEntity {
 
   public void setTxHash(String txHash) {
     this.txHash = txHash;
+  }
+
+  public Long getBlockNumber() {
+    return blockNumber;
+  }
+
+  public void setBlockNumber(Long blockNumber) {
+    this.blockNumber = blockNumber;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public Long getProductId() {
+    return productId;
+  }
+
+  public void setProductId(Long productId) {
+    this.productId = productId;
+  }
+
+  public String getBatchNo() {
+    return batchNo;
+  }
+
+  public void setBatchNo(String batchNo) {
+    this.batchNo = batchNo;
   }
 }

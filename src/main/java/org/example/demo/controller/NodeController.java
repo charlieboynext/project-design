@@ -2,6 +2,8 @@ package org.example.demo.controller;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.fisco.bcos.sdk.client.Client;
@@ -18,6 +20,8 @@ public class NodeController {
   private final ObjectProvider<Client> clientProvider;
   @Value("${system.bcos-enabled:false}")
   private boolean bcosEnabled;
+  @Value("${system.peers:}")
+  private String peers;
 
   public NodeController(ObjectProvider<Client> clientProvider) {
     this.clientProvider = clientProvider;
@@ -32,19 +36,26 @@ public class NodeController {
       status.setBlockHeight(0L);
       status.setLatency(null);
       status.setStatus("offline");
-      status.setMessage("BCOS 连接未启用或不可用，返回占位数据");
+      status.setMessage("BCOS disabled or unavailable; returning placeholder data");
       return Collections.singletonList(status);
     }
     Instant start = Instant.now();
     long height = client.getBlockNumber().getBlockNumber().longValue();
     long latency = Duration.between(start, Instant.now()).toMillis();
-    NodeStatus status = new NodeStatus();
-    status.setName("bcos");
-    status.setBlockHeight(height);
-    status.setLatency(latency);
-    status.setStatus("normal");
-    status.setMessage("来自 BCOS 查询的实时数据");
-    return Collections.singletonList(status);
+    List<NodeStatus> list = new ArrayList<>();
+    List<String> peerList = (peers == null || peers.isEmpty())
+        ? Collections.singletonList("bcos")
+        : Arrays.asList(peers.split(","));
+    for (String peer : peerList) {
+      NodeStatus status = new NodeStatus();
+      status.setName(peer.trim());
+      status.setBlockHeight(height);
+      status.setLatency(latency);
+      status.setStatus("normal");
+      status.setMessage("Realtime data from BCOS");
+      list.add(status);
+    }
+    return list;
   }
 
   public static class NodeStatus {

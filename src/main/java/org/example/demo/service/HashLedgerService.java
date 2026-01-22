@@ -1,10 +1,12 @@
 package org.example.demo.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
+import java.util.Optional;
 import org.example.demo.model.entity.HashRecord;
 import org.example.demo.repository.HashRecordRepository;
 import org.example.demo.utils.IOUtil;
@@ -51,22 +53,32 @@ public class HashLedgerService {
     try {
       String payloadJson = objectMapper.writeValueAsString(payload);
       String hash = sha256(payloadJson);
-      java.util.Optional<HashRecord> existing = hashRecordRepository.findByDataHash(hash);
+      Optional<HashRecord> existing = hashRecordRepository.findByDataHash(hash);
       if (existing.isPresent()) {
         return existing.get();
       }
       String txHash = null;
+      Long blockNumber = null;
       if (isContractConfigured()) {
         TransactionResponse response = txProcessor.sendTransactionAndGetResponse(
             hashRecorderAddress, HASH_ABI, "storeHash", Collections.singletonList(hash));
         if (response.getTransactionReceipt() != null) {
           txHash = response.getTransactionReceipt().getTransactionHash();
+          String blockStr = response.getTransactionReceipt().getBlockNumber();
+          if (blockStr != null) {
+            String hex = blockStr.startsWith("0x") ? blockStr.substring(2) : blockStr;
+            blockNumber = new BigInteger(hex, 16).longValue();
+          }
         }
       }
       HashRecord record = new HashRecord();
       record.setDataHash(hash);
       record.setPayload(payloadJson);
       record.setTxHash(txHash);
+      record.setBlockNumber(blockNumber);
+      // Try to capture basic biz info to enrich tx list.
+      record.setType(payload.getClass().getSimpleName());
+      extractBizInfo(payload, record);
       return hashRecordRepository.save(record);
     } catch (Exception ex) {
       throw new IllegalStateException("Failed to record hash", ex);
@@ -99,5 +111,40 @@ public class HashLedgerService {
       normalized = normalized.substring(2);
     }
     return normalized.replace("0", "").length() > 0;
+  }
+
+  /**
+   * Extract product/batch hints from payload to annotate transactions.
+   */
+  private void extractBizInfo(Object payload, HashRecord record) {
+    try {
+      // Direct TraceEventRequest.
+      if (payload instanceof org.example.demo.model.dto.TraceEventRequest) {
+        org.example.demo.model.dto.TraceEventRequest req = (org.example.demo.model.dto.TraceEventRequest) payload;
+        record.setProductId(req.getProductId());
+        if (req.getBatchId() != null) {
+          // Keep ID only; batchNo requires join, leave null here.
+          record.setBatchNo(null);
+        }
+        record.setType("TraceEvent");
+        return;
+      }
+      // Wrapper classes exposing getRequest().
+      try {
+        java.lang.reflect.Method m = payload.getClass().getMethod("getRequest");
+        Object reqObj = m.invoke(payload);
+        if (reqObj instanceof org.example.demo.model.dto.TraceEventRequest) {
+          org.example.demo.model.dto.TraceEventRequest req = (org.example.demo.model.dto.TraceEventRequest) reqObj;
+          record.setProductId(req.getProductId());
+          record.setBatchNo(null);
+          record.setType("TraceEvent");
+          return;
+        }
+      } catch (Exception ignore) {
+        // ignore reflection failures
+      }
+    } catch (Exception e) {
+      log.warn("extract biz info failed: {}", e.getMessage());
+    }
   }
 }
