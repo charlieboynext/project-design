@@ -1,5 +1,5 @@
 import { apiGet, apiPost, apiPut, apiDelete } from './http'
-import type { Product, Batch, TraceEvent, TraceResponse, QRCodeRecord, PageResult, Inventory, Commodity } from './types'
+import type { Product, Batch, TraceEvent, TraceResponse, QRCodeRecord, PageResult, Inventory, Commodity, OrgRecord } from './types'
 import type { TxRecord, CertRecord, NodeHealth } from './types'
 
 type BackendProduct = {
@@ -82,6 +82,15 @@ type BackendNode = {
   blockHeight?: number
   latency?: number
   status?: string
+}
+
+type BackendOrg = {
+  id: number
+  name: string
+  role?: string
+  nodeId?: string
+  contact?: string
+  active?: boolean
 }
 
 type BackendUser = {
@@ -183,6 +192,15 @@ const toTrace = (r: BackendTraceResult): TraceResponse => ({
 })
 
 const normalizeQrStatus = (s?: string): string | undefined => (s ? s.toLowerCase() : undefined)
+
+const toOrg = (o: BackendOrg): OrgRecord => ({
+  id: o.id,
+  name: o.name,
+  role: o.role,
+  nodeId: o.nodeId,
+  contact: o.contact,
+  active: o.active,
+})
 
 export async function fetchProducts(keyword = '', page = 1, size = 10): Promise<PageResult<Product>> {
   const params = new URLSearchParams()
@@ -400,6 +418,47 @@ export async function fetchNodes(): Promise<NodeHealth[]> {
     latency: n.latency,
     status: n.status,
   }))
+}
+
+// ============ 组织管理 API ============
+const toOrg = (o: BackendOrg): OrgRecord => ({
+  id: o.id,
+  name: o.name,
+  role: o.role,
+  nodeId: o.nodeId,
+  contact: o.contact,
+  active: o.active,
+})
+
+export async function fetchOrgs(): Promise<OrgRecord[]> {
+  const res = await apiGet<BackendOrg[]>('/orgs')
+  return res.map(toOrg)
+}
+
+export async function createOrg(input: OrgRecord): Promise<OrgRecord> {
+  const res = await apiPost<BackendOrg>('/orgs', {
+    name: input.name,
+    role: input.role,
+    nodeId: input.nodeId,
+    contact: input.contact,
+    active: input.active ?? true,
+  })
+  return toOrg(res)
+}
+
+export async function updateOrg(id: number, input: OrgRecord): Promise<OrgRecord> {
+  const res = await apiPut<BackendOrg>(`/orgs/${id}`, {
+    name: input.name,
+    role: input.role,
+    nodeId: input.nodeId,
+    contact: input.contact,
+    active: input.active ?? true,
+  })
+  return toOrg(res)
+}
+
+export async function deleteOrg(id: number) {
+  await apiDelete(`/orgs/${id}`)
 }
 
 export async function fetchAdminUsers(page = 1, size = 10): Promise<PageResult<{ id?: number; username: string; roles?: string[] }>> {

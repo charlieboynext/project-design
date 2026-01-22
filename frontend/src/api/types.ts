@@ -76,6 +76,15 @@ export interface NodeHealth {
   status?: string
 }
 
+export interface OrgRecord {
+  id?: number
+  name: string
+  role?: string
+  nodeId?: string
+  contact?: string
+  active?: boolean
+}
+
 export interface TraceResponse {
   product: Product
   batch: Batch
